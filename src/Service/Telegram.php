@@ -1,6 +1,6 @@
 <?php
 
-namespace DerBot\Service;
+namespace Deralsem\Tgbotapiwrapper\Service;
 
 class Telegram
 {
@@ -25,7 +25,7 @@ class Telegram
 
     public function editMessage($chatId, $msgId, $text)
     {
-        $this->apiRequest("editMessageText", array(
+        $this->apiRequest("editFMessageText", array(
                 'chat_id' => $chatId,
                 'message_id' => $msgId,
                 'text' => $text,
@@ -54,7 +54,7 @@ class Telegram
             ));
     }
 
-    public function answerClb($clbId, $text, $alert = false)
+    public function answerClb($clbId, $text, ?bool $alert = null)
     {
         $this->apiRequest("answerCallbackQuery", array(
                 'callback_query_id' => $clbId,
