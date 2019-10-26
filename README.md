@@ -4,7 +4,6 @@
 [![Latest Stable Version](https://poser.pugx.org/deralsem/tgbotapiwrapper/v/stable?format=flat)](https://packagist.org/packages/deralsem/tgbotapiwrapper)
 [![PHP Version](https://img.shields.io/packagist/php-v/deralsem/tgbotapiwrapper/dev-master)](https://www.php.net/)
 
-
 Telegram BOT api wrapper
 
 ## Installation
