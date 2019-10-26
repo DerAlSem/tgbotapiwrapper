@@ -46,4 +46,5 @@
         "bccheck": "roave-backward-compatibility-check"
     },
     "minimum-stability": "dev"
+
 }
