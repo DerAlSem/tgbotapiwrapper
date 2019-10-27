@@ -24,7 +24,7 @@ class Telegram
         $this->apiUrl = "https://api.telegram.org/bot$botToken/";
     }
 
-    public function sendMessage(int $chatId, string $text): string
+    public function sendMessage(int $chatId, string $text): ?string
     {
         return $this->apiRequest("sendMessage", array(
             'chat_id' => $chatId,
@@ -34,49 +34,49 @@ class Telegram
         ));
     }
 
-    public function editMessage(int $chatId, int $msgId, string $text): string
+    public function editMessage(int $chatId, int $msgId, string $text): ?string
     {
         return $this->apiRequest("editFMessageText", array(
-                'chat_id' => $chatId,
-                'message_id' => $msgId,
-                'text' => $text,
-                'parse_mode' => 'HTML'
-            ));
+            'chat_id' => $chatId,
+            'message_id' => $msgId,
+            'text' => $text,
+            'parse_mode' => 'HTML'
+        ));
     }
 
-    public function sendMessageKbrd(int $chatId, int $text, array $markup): string
+    public function sendMessageKbrd(int $chatId, int $text, array $markup): ?string
     {
         return $this->apiRequest("sendMessage", array(
-                'chat_id' => $chatId,
-                'text' => $text,
-                'reply_markup' => $markup,
-                'parse_mode' => 'HTML',
-            ));
+            'chat_id' => $chatId,
+            'text' => $text,
+            'reply_markup' => $markup,
+            'parse_mode' => 'HTML',
+        ));
     }
 
-    public function editMessageKbrd(int $chatId, int $msgId, int $text, array $markup): string
+    public function editMessageKbrd(int $chatId, int $msgId, int $text, array $markup): ?string
     {
         return $this->apiRequest("editMessageText", array(
-                'chat_id' => $chatId,
-                'message_id' => $msgId,
-                'text' => $text,
-                'reply_markup' => $markup,
-                'parse_mode' => 'HTML'
-            ));
+            'chat_id' => $chatId,
+            'message_id' => $msgId,
+            'text' => $text,
+            'reply_markup' => $markup,
+            'parse_mode' => 'HTML'
+        ));
     }
 
-    public function answerClb(int $clbId, array $text, ?bool $alert = null): string
+    public function answerClb(int $clbId, array $text, ?bool $alert = null): ?string
     {
         return $this->apiRequest("answerCallbackQuery", array(
-                'callback_query_id' => $clbId,
-                'text' => $text,
-                'show_alert' => $alert
-            ));
+            'callback_query_id' => $clbId,
+            'text' => $text,
+            'show_alert' => $alert
+        ));
     }
 
-    public function hookInfo(): string
+    public function hookInfo(): ?string
     {
-        return $this->apiRequest('getWebhookInfo', array());
+        return $this->apiRequest('getWebhookInfo');
     }
 
     public function hookSet(string $webhookUrl): string
@@ -84,7 +84,7 @@ class Telegram
         return $this->apiRequest('setWebhook', array('url' => $webhookUrl));
     }
 
-    private function apiRequest(string $method, ?array $parameters = null): ?string
+    private function apiRequest(string $method, ?array $parameters = []): ?string
     {
         $url = $this->apiUrl . $method . '?' . http_build_query($parameters);
         $handle = curl_init($url);
@@ -102,38 +102,45 @@ class Telegram
         /**
          * @var string|null
          */
-        $response = curl_exec($handle);
+        $curl_response = curl_exec($handle);
         /**
          * @var string|null
          */
         $error = curl_error($handle);
         $errno = curl_errno($handle);
-        if (!isset($response) || isset($error)) {
+        if ($error !== '') {
             $this->error = "cURL returned error $errno: $error";
             curl_close($handle);
             return $this->error;
         } else {
+            $response_decode = json_decode($curl_response, true);
+            $response = '';
+            $data = $response_decode;
+            $response_decode['ok'] && is_array($response_decode['result'])? $data = $response_decode['result'] : false ;
+            foreach ( $data as $key => $val) {
+                (is_numeric($val) && (int)$val == $val && $val > 999999999) ?
+                    $value = date('M/D H:i:s', $val) :
+                    $value = $val;
+                $response .= "$key => $value" . PHP_EOL;
+            }
             $httpCode = intval(curl_getinfo($handle, CURLINFO_HTTP_CODE));
             curl_close($handle);
             switch (true) {
                 case $httpCode >= 500:
+                    echo $this->error = "cURL request has failed with error $httpCode: $response\nsleeping for 10 seconds";
                     sleep(10);
-                    $this->error = "cURL returned error: $httpCode";
                     break;
                 case ($httpCode == 401):
-                    $this->error = "Invalid access token provided: $httpCode";
+                    echo $this->error = "Invalid access token provided $httpCode: $response";
                     break;
                 case ($httpCode != 200):
-                    $response = json_decode($response, true);
-                    $this->error = "cURL request has failed with error {$response['error_code']}: {$response['description']}";
+                    echo $this->error = "cURL request has failed with error $httpCode: $response";
                     break;
                 default:
-                    $response = json_decode($response, true);
-                    $this->requestResult = "cURL request was successful: {$response['result']}";
-                    isset($response['description']) ? $this->requestResult .= " {$response['description']}" : false;
+                    $this->requestResult = "cURL request was successful:\n" . $response;
             }
         }
-        isset($this->error)? $res = $this->requestResult : $res = null;
+        !isset($this->error)? $res = $this->requestResult : $res = null;
         return $res;
     }
 }
