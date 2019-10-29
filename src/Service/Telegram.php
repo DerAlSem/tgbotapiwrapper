@@ -114,15 +114,26 @@ class Telegram
             return $this->error;
         } else {
             $response_decode = json_decode($curl_response, true);
-            $response = '';
-            $data = $response_decode;
-            $response_decode['ok'] && is_array($response_decode['result'])? $data = $response_decode['result'] : false ;
-            foreach ( $data as $key => $val) {
-                (is_numeric($val) && (int)$val == $val && $val > 999999999) ?
-                    $value = date('M/D H:i:s', $val) :
-                    $value = $val;
-                $response .= "$key => $value" . PHP_EOL;
-            }
+            //$response = '';
+            //$data = $response_decode;
+            //$response_decode['ok'] && is_array($response_decode['result'])? $data = $response_decode['result'] : false ;
+            $response = print_r($response_decode,true);
+            /*            foreach ( $data as $key => $val) {
+                            if (is_array($val)) {
+                                foreach ($val as $key1 => $val1) {
+                                    (is_numeric($val1) && (int)$val1 == $val1 && $val1 > 999999999) ?
+                                        $value = date('M/D H:i:s', $val1) :
+                                        $value = $val1;
+                                    $response .= "$key1 => $value" . PHP_EOL;
+                                }
+                            }
+                            else {
+                                (is_numeric($val) && (int)$val == $val && $val > 999999999) ?
+                                    $value = date('M/D H:i:s', $val) :
+                                    $value = $val;
+                                $response .= "$key => $value" . PHP_EOL;
+                            }
+                        }*/
             $httpCode = intval(curl_getinfo($handle, CURLINFO_HTTP_CODE));
             curl_close($handle);
             switch (true) {
