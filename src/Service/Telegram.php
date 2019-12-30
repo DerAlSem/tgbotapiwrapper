@@ -102,7 +102,7 @@ class Telegram
         /**
          * @var string|null
          */
-        $curl_response = curl_exec($handle);
+        $curlResponse = curl_exec($handle);
         /**
          * @var string|null
          */
@@ -112,12 +112,13 @@ class Telegram
             $this->error = "cURL returned error $errno: $error";
             curl_close($handle);
             return $this->error;
-        } else {
-            $response_decode = json_decode($curl_response, true);
+        }
+
+            $responseDecode = json_decode($curlResponse, true);
             //$response = '';
-            //$data = $response_decode;
-            //$response_decode['ok'] && is_array($response_decode['result'])? $data = $response_decode['result'] : false ;
-            $response = print_r($response_decode,true);
+            //$data = $responseDecode;
+            //$responseDecode['ok'] && is_array($responseDecode['result'])? $data = $responseDecode['result'] : false ;
+            $response = print_r($responseDecode, true);
             /*            foreach ( $data as $key => $val) {
                             if (is_array($val)) {
                                 foreach ($val as $key1 => $val1) {
@@ -150,7 +151,6 @@ class Telegram
                 default:
                     $this->requestResult = "cURL request was successful:\n" . $response;
             }
-        }
         !isset($this->error)? $res = $this->requestResult : $res = null;
         return $res;
     }
