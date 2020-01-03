@@ -86,6 +86,13 @@ class Telegram
 
     private function apiRequest(string $method, ?array $parameters = []): ?string
     {
+        foreach ($parameters as $key => &$val) {
+            // encoding to JSON array parameters, for example reply_markup
+            if (!is_numeric($val) && !is_string($val)) {
+                $val = json_encode($val);
+            }
+        }
+
         $url = $this->apiUrl . $method . '?' . http_build_query($parameters);
         $handle = curl_init($url);
         if (is_resource($handle)) {
