@@ -44,7 +44,7 @@ class Telegram
         ));
     }
 
-    public function sendMessageKbrd(int $chatId, int $text, array $markup): ?string
+    public function sendMessageKbrd(int $chatId, string $text, array $markup): ?string
     {
         return $this->apiRequest("sendMessage", array(
             'chat_id' => $chatId,
@@ -54,7 +54,7 @@ class Telegram
         ));
     }
 
-    public function editMessageKbrd(int $chatId, int $msgId, int $text, array $markup): ?string
+    public function editMessageKbrd(int $chatId, int $msgId, string $text, array $markup): ?string
     {
         return $this->apiRequest("editMessageText", array(
             'chat_id' => $chatId,
@@ -143,10 +143,10 @@ class Telegram
                     sleep(10);
                     break;
                 case ($httpCode == 401):
-                    echo $this->error = "Invalid access token provided $httpCode: $response";
+                    echo $this->error = "Invalid access token provided $httpCode:\n$response";
                     break;
                 case ($httpCode != 200):
-                    echo $this->error = "cURL request has failed with error $httpCode: $response";
+                    echo $this->error = "cURL request has failed with error $httpCode:\n$response";
                     break;
                 default:
                     $this->requestResult = "cURL request was successful:\n" . $response;
